@@ -1,0 +1,15 @@
+{
+  "name": "technewsbot",
+  "version": "1.0.0",
+  "description": "Tech News Bot",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "John de Havilland",
+  "license": "MIT",
+  "dependencies": {
+    "botbuilder": "^3.11.0",
+    "restify": "^6.0.1"
+  }
+}
