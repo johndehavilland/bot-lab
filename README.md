@@ -91,7 +91,7 @@ MICROSOFT_APP_PASSWORD
 
 ## Integrate NL into your bot.
 
-1. We are now going to integrate this natural language into your bot. Add the following code to your bot just before the `server.post
+1. We are now going to integrate this natural language into your bot. Add the following code to your bot just before the `server.post`
 
 ```javascript
 var LUIS_URL = "<luis_url>"
@@ -131,6 +131,7 @@ bot.on('conversationUpdate', (message) => {
 
 3. Right after this, above the `server.post` add the following:
 
+```javascript
 bot.dialog('search', [
     async (session, args) => {
         session.sendTyping();
@@ -153,6 +154,7 @@ bot.dialog('unknown', [
 var searchQuery = async (session, args) => {
     return session.endDialog("You triggered a search for "+ args.query);
 }
+```
 
 4. Replace the  `server.listen` with the following:
 
@@ -194,7 +196,6 @@ var searchQuery = async (session, args) => {
         return session.endDialog('Sorry… couldnt find any results for your query! 🤐');
     }
 }
-```
 
 var fetchSearchResults = async (query) => {
     var searchResults = [];
