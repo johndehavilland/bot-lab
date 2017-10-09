@@ -67,21 +67,21 @@ MICROSOFT_APP_PASSWORD
 
 2. Once logged in, you need to create an application. Give it a name and description and click create.
 
-![Create a LUIS app](/images/create_luis.png)
+![Create a LUIS app](/images/create_luis.PNG)
 
 3. Now you need to create an intent by clicking on *create an intent*
 
 4. The first intent we will add is a *search* intent. Enter this and press save.
 
 5. Now we need to define some utterances that will trigger this intent. These will be example phrases that a user may use that would expect to trigger this search intent. Examples could be
-![Defined utterances](/images/defined_utterances.png)
+![Defined utterances](/images/defined_utterances.PNG)
 
 6. When you have defined a few utterances, Save these and then navigate to *Entities*
 
 7. Choose *Add a Custom Entity* and create a entity called *keywords*. This will basically be used to extract the keywords from a submitted user phrase.
 
 8. Now switch back to Intents and choose the Search intent. Within the Search intent we now need to flag the entity for each entity. Do this by click on a word (or more) and choose the entity defined in step 7. 
-![Adding entity](/images/defined_keywords.png)
+![Adding entity](/images/defined_keywords.PNG)
 
 9. When this is complete, choose Save and then navigate to *Train and Test*
 
@@ -174,10 +174,10 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
 2. Choose New Custom Search and enter a name.
 
 3. On the new app page that appears, enter stackoverflow.com as the website like so (important, do not enter http://www before it):
-![Stack Overflow](/images/stackoverflow.png)
+![Stack Overflow](/images/stackoverflow.PNG)
 
 4. Click the endpoint icon next to the app name to navigate to the endpoint page:
-![End point page](/images/stackoverflow_endpoint.png)
+![End point page](/images/stackoverflow_endpoint.PNG)
 
 5. Take a copy of the primary key (press the reveal icon) and custom configuration id.
 
