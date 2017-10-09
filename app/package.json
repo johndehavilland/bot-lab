@@ -10,6 +10,7 @@
   "license": "MIT",
   "dependencies": {
     "botbuilder": "^3.11.0",
-    "restify": "^6.0.1"
+    "restify": "^6.0.1",
+    "request-promise": "^4.2.1"    
   }
 }
