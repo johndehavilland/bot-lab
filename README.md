@@ -1,6 +1,6 @@
 # Intelligent Bot Lab
 
-This lab walks through building out an intelligent bot on the Azure platform.
+This lab walks through building out an intelligent bot on the Azure platform. It has been adapted from the [Stack Overflow Bot Sample](https://github.com/Microsoft/BotFramework-Samples/tree/master/StackOverflow-Bot).
 
 ## Create the initial bot endpoint
 
