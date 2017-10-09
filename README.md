@@ -336,7 +336,10 @@ az webapp deployment source config-local-git --name $bothandle --resource-group 
 4. Copy the url that is displayed and locally navigate to the bot app directory and run the following commands:
 
 ```
-cd <MyGitRepo>
+cd bot-lab/app
+git init
+git add .
+git commit -m "initial commit"
 git remote add azure <URLResultFromLastStep>
 git push azure master
 ```
@@ -349,7 +352,6 @@ MICROSOFT_APP_PASSWORD
 ```	
 
 6. Navigate to your bot application in the [bot portal](https://dev.botframework.com)	
-7. Edit your bot and Update the message endpoint to point to your app as follows:
-		https://<appurl>/api/messages
+7. Edit your bot and Update the message endpoint to point to your app as follows: `https://<appurl>/api/messages`
 	
 8. Try it out - you should be able to interact with the bot in Slack
