@@ -16,52 +16,6 @@ This lab walks through building out an intelligent bot on the Azure platform.
 
 5. Make sure you can send and receive messages from your bot in the emulator.
 
-## Create a slack channel for the bot
-1. Go to  [https://dev.botframework.com/bots/new](https://dev.botframework.com/bots/new) and create a bot application by filling out the details. Leave the message endpoint blank for now.
-
-2. Setup Slack as a platform for your bot - details here: [https://docs.microsoft.com/en-us/bot-framework/channel-connect-slack](https://docs.microsoft.com/en-us/bot-framework/channel-connect-slack)
-
-## Deploy the Bot to Azure
-
-1. Open up the [Azure portal](https://portal.azure.com) and login 
-
-2. Open the cloud shell and make sure it is in BASH mode.
-
-3. Run the following commands, replacing the placeholders with your own values
-
-```
-rgname=<name of resource group>
-myplanname=<name of app plan>
-bothandle=<name of bot>
-
-az group create --location eastus --name $rgname
-az appservice plan create --name $myplanname --resource-group $rgname --sku FREE
-az webapp create --name $bothandle  --resource-group $rgname --plan $myplanname
-az webapp deployment user set --user-name <username> --password <password>
-az webapp deployment source config-local-git --name $bothandle --resource-group $rgname --query url --output tsv
-```	
-
-4. Copy the url that is displayed and locally navigate to the bot app directory and run the following commands:
-
-```
-cd <MyGitRepo>
-git remote add azure <URLResultFromLastStep>
-git push azure master
-```
-
-5. Once that has completed, in the portal go to the web app, choose Application Settings and add the following two settings. Use the values from when you created your bot.
-
-```
-MICROSOFT_APP_ID
-MICROSOFT_APP_PASSWORD
-```	
-
-6. Navigate to your bot application in the [bot portal](https://dev.botframework.com)	
-7. Edit your bot and Update the message endpoint to point to your app as follows:
-		https://<appurl>/api/messages
-	
-8. Try it out - you should be able to interact with the bot in Slack
-
 ## Create a Natural Language Understanding App
 1. First go to [luis.ai](https://luis.ai) and create/login to your LUIS account. LUIS stands for Language Understanding Intelligent Service. You can find out more details [here](https://docs.microsoft.com/en-us/azure/cognitive-services/LUIS/Home)
 
@@ -89,7 +43,7 @@ MICROSOFT_APP_PASSWORD
 
 11. Finally, switch back over to publish and choose Publish to publish your app. Copy the endpoint for future use.
 
-## Integrate NL into your bot.
+## Integrate natural language processing into your bot.
 
 1. We are now going to integrate this natural language into your bot. Add the following code to your bot just before the `server.post`
 
@@ -129,7 +83,15 @@ bot.on('conversationUpdate', (message) => {
 });
 ```
 
-3. Right after this, above the `server.post` add the following:
+3. Delete:
+```javascript
+// Receive messages from the user and respond by echoing each message back (prefixed with 'You said:')
+var bot = new builder.UniversalBot(connector, function (session) {
+    session.send("You said: %s.", session.message.text);
+});
+```
+
+4. Below the `server.post` add the following:
 
 ```javascript
 bot.dialog('search', [
@@ -156,18 +118,9 @@ var searchQuery = async (session, args) => {
 }
 ```
 
-4. Replace the  `server.listen` with the following:
-
-```javascript
-server.listen(process.env.port || process.env.PORT || 3978, () => {
-    console.log('%s listening to %s', server.name, server.url);
-});
-```
-
-
 5. Run the app and try it in the emulator. You should see certain phrases trigger the search intent. Since we only have the Search intent and the None intent you will probably trigger the Search intent with each phrase.
 
-## Integrate in Search functionality.
+## Integrate in Search Functionality.
 
 1. For this we will use the Bing Custom Search service. Navigate to [https://customsearch.ai/](https://customsearch.ai/) and sign in.
 
@@ -181,7 +134,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
 
 5. Take a copy of the primary key (press the reveal icon) and custom configuration id.
 
-6. Add the following replacing the searchQuery - keep the server.post code intact below this:
+6. Add the following replacing the searchQuery (replace the placeholders with your values from customsearch):
 
 ```javascript
 var searchQuery = async (session, args) => {
@@ -217,6 +170,46 @@ var fetchSearchResults = async (query) => {
     });
 
     return searchResults;
+}
+
+var bingSearchClient = async (userSearchText, cb) => {
+
+    var bingSearchConfig = "<config_code>";
+    var bingSearchKey = "<primary_key>";
+    var bingSearchCount = 6;
+    var bingSearchMkt = "en-us";
+    var bingSearchBaseUrl = "https://api.cognitive.microsoft.com/bingcustomsearch/v5.0/search";
+    var bingSearchMaxSearchStringSize = 150;
+    
+    cb = cb || (() => {});
+
+    const searchText = userSearchText.substring(0, bingSearchMaxSearchStringSize).trim();
+
+    const url = bingSearchBaseUrl + "?"
+                + `q=${encodeURIComponent(searchText)}`
+                + `&customconfig=${bingSearchConfig}`
+                + `&count=${bingSearchCount}`
+                + `&mkt=${bingSearchMkt}`
+                + "&offset=0&responseFilter=Webpages&safesearch=Strict";
+
+    const options = {
+        method: 'GET',
+        uri: url,
+        json: true,
+        headers: {
+            "Ocp-Apim-Subscription-Key": bingSearchKey
+        }
+    };
+
+    await rp(options)
+        .then((body) => {
+            // POST succeeded
+            return cb(null, body);
+        })
+        .catch((err) => {
+            // POST failed
+            return cb(err);
+        });
 }
 
 const buildResultsMessageWithAttachments = (session, resultsArray) => {
@@ -280,47 +273,83 @@ const buildResultsMessageWithAttachments = (session, resultsArray) => {
     return message;
 };
 
-var bingSearchClient = async (userSearchText, cb) => {
-
-    var bingSearchConfig = "<config_code>";
-    var bingSearchKey = "<primary_key>";
-    var bingSearchCount = 6;
-    var bingSearchMkt = "en-us";
-    var bingSearchBaseUrl = "https://api.cognitive.microsoft.com/bingcustomsearch/v5.0/search";
-    var bingSearchMaxSearchStringSize = 150;
-    
-    cb = cb || (() => {});
-
-    const searchText = userSearchText.substring(0, bingSearchMaxSearchStringSize).trim();
-
-    const url = bingSearchBaseUrl + "?"
-                + `q=${encodeURIComponent(searchText)}`
-                + `&customconfig=${bingSearchConfig}`
-                + `&count=${bingSearchCount}`
-                + `&mkt=${bingSearchMkt}`
-                + "&offset=0&responseFilter=Webpages&safesearch=Strict";
-
-    const options = {
-        method: 'GET',
-        uri: url,
-        json: true,
-        headers: {
-            "Ocp-Apim-Subscription-Key": bingSearchKey
-        }
-    };
-
-    await rp(options)
-        .then((body) => {
-            // POST succeeded
-            return cb(null, body);
-        })
-        .catch((err) => {
-            // POST failed
-            return cb(err);
-        });
-}
 ```
 
 7. Run this in the emulator and you should see it return cards for questions to Stack Overflow.
 
-8. Now you can push this to your Azure repository and try it out in Slack.
+
+## Add Another Intent
+1. The above LUIS model has just 2 intents - Search and None. Let's add in another intent to give your app a more human touch. A joke intent.
+
+2. Go back to your LUIS app ([https://luis.ai](https://luis.ai)).
+
+3. Under Intents choose *Add New Intent* and a new intent called *joke*
+
+4. The goal of this intent is to allow the user to ask your bot for a joke. Train this intent with some ways a user may ask for a joke:
+
+![Examples of utterances for joke intent](/images/joke_intent.PNG)
+
+5. Save this and navigate to *Train and Test*. Train the model and test it out and make sure it responds accordingly.
+
+6. Navigate to *Publish* and click publish to update the existing published model.
+
+7. In your app, we now need to react when we see a joke intent. To do this add in the following code - feel free to modify to choose from a collection of jokes at random:
+
+```javascript
+bot.dialog('joke', [
+    async (session, args) => {
+        var joke = "A SQL query goes into a bar, walks up to two tables and asks, 'Can I join you?'";
+        session.send(joke);
+    }
+]).triggerAction({
+    matches: ['joke']
+});
+```
+
+8. Try it out in the emulator, you should see if you ask for a joke it will now trigger this action instead of searching Stack Overflow.
+
+## Create a slack channel for the bot
+1. Go to  [https://dev.botframework.com/bots/new](https://dev.botframework.com/bots/new) and create a bot application by filling out the details. Leave the message endpoint blank for now.
+
+2. Setup Slack as a platform for your bot - details here: [https://docs.microsoft.com/en-us/bot-framework/channel-connect-slack](https://docs.microsoft.com/en-us/bot-framework/channel-connect-slack)
+
+## Deploy the Bot to Azure
+
+1. Open up the [Azure portal](https://portal.azure.com) and login 
+
+2. Open the cloud shell and make sure it is in BASH mode.
+
+3. Run the following commands, replacing the placeholders with your own values
+
+```
+rgname=<name of resource group>
+myplanname=<name of app plan>
+bothandle=<name of bot>
+
+az group create --location eastus --name $rgname
+az appservice plan create --name $myplanname --resource-group $rgname --sku FREE
+az webapp create --name $bothandle  --resource-group $rgname --plan $myplanname
+az webapp deployment user set --user-name <username> --password <password>
+az webapp deployment source config-local-git --name $bothandle --resource-group $rgname --query url --output tsv
+```	
+
+4. Copy the url that is displayed and locally navigate to the bot app directory and run the following commands:
+
+```
+cd <MyGitRepo>
+git remote add azure <URLResultFromLastStep>
+git push azure master
+```
+
+5. Once that has completed, in the portal go to the web app, choose Application Settings and add the following two settings. Use the values from when you created your bot.
+
+```
+MICROSOFT_APP_ID
+MICROSOFT_APP_PASSWORD
+```	
+
+6. Navigate to your bot application in the [bot portal](https://dev.botframework.com)	
+7. Edit your bot and Update the message endpoint to point to your app as follows:
+		https://<appurl>/api/messages
+	
+8. Try it out - you should be able to interact with the bot in Slack

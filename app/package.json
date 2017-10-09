@@ -1,12 +1,12 @@
 {
-  "name": "technewsbot",
+  "name": "azure-bot-lab",
   "version": "1.0.0",
-  "description": "Tech News Bot",
+  "description": "Stack Overflow Bot",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "John de Havilland",
+  "author": "lab",
   "license": "MIT",
   "dependencies": {
     "botbuilder": "^3.11.0",
