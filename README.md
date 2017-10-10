@@ -45,7 +45,7 @@ This lab walks through building out an intelligent bot on the Azure platform. It
 
 ## Integrate natural language processing into your bot.
 
-1. We are now going to integrate this natural language into your bot. Add the following code to your bot just before the `server.post`
+1. We are now going to integrate this natural language into your bot. Add the following code to your bot just before the `server.post`. Note that the code below uses async/await which is available in Node 7.6 and above.
 
 ```javascript
 var LUIS_URL = "<luis_url>"
