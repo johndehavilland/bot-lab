@@ -17,7 +17,7 @@ This lab walks through building out an intelligent bot on the Azure platform. It
 5. Make sure you can send and receive messages from your bot in the emulator.
 
 ## Create a Natural Language Understanding App
-1. First go to [luis.ai](https://luis.ai) and create/login to your LUIS account. LUIS stands for Language Understanding Intelligent Service. You can find out more details [here](https://docs.microsoft.com/en-us/azure/cognitive-services/LUIS/Home)
+1. First go to [luis.ai](http://luis.ai) and create/login to your LUIS account. LUIS stands for Language Understanding Intelligent Service. You can find out more details [here](https://docs.microsoft.com/en-us/azure/cognitive-services/LUIS/Home)
 
 2. Once logged in, you need to create an application. Give it a name and description and click create.
 
@@ -34,14 +34,14 @@ This lab walks through building out an intelligent bot on the Azure platform. It
 
 7. Choose *Add a Custom Entity* and create a entity called *keywords*. This will basically be used to extract the keywords from a submitted user phrase.
 
-8. Now switch back to Intents and choose the Search intent. Within the Search intent we now need to flag the entity for each entity. Do this by click on a word (or more) and choose the entity defined in step 7. 
-![Adding entity](/images/defined_keywords.PNG)
+8. Now switch back to Intents and choose the Search intent. Within the Search intent we now need to flag the entity for each utterance. Do this by click on a word (or more) and choose the entity defined in step 7. 
+![Adding entity](/images/define_keywords.PNG)
 
 9. When this is complete, choose Save and then navigate to *Train and Test*
 
 10. Once complete, you can try it out and see how it performs. Type in a phrase and see if the LUIS app detects the right intent and also extracts the right part.
 
-11. Finally, switch back over to publish and choose Publish to publish your app. Copy the endpoint for future use.
+11. Finally, switch back over to publish and choose Publish to publish your app. Copy the endpoint for future use. **Note** under API Key, there should be a starter key automatically created for you.
 
 ## Integrate natural language processing into your bot.
 
